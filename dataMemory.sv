@@ -1,14 +1,19 @@
-module addressCounter(
+module dataMemory(
     input logic clk,
+    input logic writeEnable,
+    input logic [31:0] writeData,
+    input logic [31:0] address,
 
-    output logic [31:0] address
+    output logic [31:0] readData
 );
 
-logic [31:0] registerArray [0:127];
-address = 32'd0;
+logic [31:0] memory [0:255];
 
 always_ff @(posedge clk) begin
-    address <= address + 32'd4;
-end
+    if (writeEnable)
+        memory[address[9:2]] <= writeData;
 
+    else
+        readData <= memory[address[9:2]] ;
+end
 endmodule

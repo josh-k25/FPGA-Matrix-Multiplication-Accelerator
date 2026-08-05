@@ -1,14 +1,19 @@
 module addressCounter(
     input logic clk,
+    input logic addressEnable,
+    input logic addressReset,
 
+    output logic lastAddress,
     output logic [31:0] address
 );
 
-logic [31:0] registerArray [0:127];
-address = 32'd0;
-
 always_ff @(posedge clk) begin
-    address <= address + 32'd4;
+    if (addressReset)
+        address <= 32'b0;
+    else if (addressEnable)
+        address <= address + 32'd4;
 end
+
+assign lastAddress = (address == 32'd60);
 
 endmodule

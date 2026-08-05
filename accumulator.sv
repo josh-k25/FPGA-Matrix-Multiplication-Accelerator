@@ -1,5 +1,7 @@
 module accumulator(
-    input logic accumulateEnable,
+    input logic clk,
+    input logic accumulatorClear,
+    input logic accumulatorEnable,
     input logic reset,
     input logic [31:0] data,
 
@@ -9,8 +11,10 @@ module accumulator(
 always_ff @(posedge clk or posedge reset) begin
     if (reset)
         sum <= 32'd0;
-    else 
-    sum <= sum + data;
+    else if (accumulatorClear)
+        sum <= 32'd0;
+    else if (accumulatorEnable)
+        sum <= sum + data;
 end 
 
 endmodule
