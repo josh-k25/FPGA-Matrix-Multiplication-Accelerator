@@ -43,6 +43,7 @@ always_comb begin
 
     // state machine logic 
     case (currentState)
+        //waiting to start
         IDLE: begin
             addressEnable = 1'b0;
             addressReset = 1'b0;
@@ -57,6 +58,7 @@ always_comb begin
                 nextState = IDLE;
         end
 
+        //loading 0, 1, ... 15
         LOAD: begin
             addressEnable = 1'b1;
             addressReset = 1'b0;
@@ -73,6 +75,7 @@ always_comb begin
                 nextState = LOAD;
         end
 
+        //
         PREP: begin
             addressEnable = 1'b1;
             addressReset = 1'b0;

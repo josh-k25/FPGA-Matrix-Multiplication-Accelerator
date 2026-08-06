@@ -34,6 +34,7 @@ dataMemory dataMemory(
 
 addressCounter addressCounter(
     .clk(clk),
+    .reset(reset),
     .addressEnable(addressEnable),
     .addressReset(addressReset),
     .lastAddress(lastAddress),
