@@ -3,18 +3,19 @@ module accumulator(
     input logic accumulatorClear,
     input logic accumulatorEnable,
     input logic reset,
-    input logic [31:0] data,
+    input logic [15:0] product
 
-    output logic [31:0] sum
+    //18 bits since 8 bit x 8 bit is 16 bits and sum needs to hold 4 x 16 bits 
+    output logic [17:0] sum
 );
 
 always_ff @(posedge clk or posedge reset) begin
     if (reset)
-        sum <= 32'd0;
+        sum <= 18'd0;
     else if (accumulatorClear)
-        sum <= 32'd0;
+        sum <= 18'd0;
     else if (accumulatorEnable)
-        sum <= sum + data;
+        sum <= sum + product;
 end 
 
 endmodule
