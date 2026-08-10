@@ -3,7 +3,7 @@ module accumulator(
     input logic accumulatorClear,
     input logic accumulatorEnable,
     input logic reset,
-    input logic [15:0] product
+    input logic [15:0] product,
 
     //18 bits since 8 bit x 8 bit is 16 bits and sum needs to hold 4 x 16 bits 
     output logic [17:0] sum

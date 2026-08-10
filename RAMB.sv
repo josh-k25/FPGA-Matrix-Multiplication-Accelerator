@@ -2,19 +2,18 @@ module RAMB(
     input logic clk,
     input logic writeEnable,
     input logic [3:0] address,
-    input logic [15:0] dataIn,
+    input logic [7:0] dataIn,
 
-    output logic [15:0] dataOut
+    output logic [7:0] dataOut
 );
 
-logic [15:0] ramB [0:15];
+logic [7:0] ramB [0:15];
 
-always_ff @(posedge clk) begin
+always_ff @(posedge clk)
     if (writeEnable)
         ramB[address] <= dataIn;
-    
-    else 
-        dataOut = ramB[address];
-end
+
+dataOut = ramB[address];
+
 
 endmodule
