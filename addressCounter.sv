@@ -5,18 +5,23 @@ module addressCounter(
     input logic addressReset,
 
     output logic lastAddress,
-    output logic [31:0] address
+    output logic [3:0] address,
+    output logic [1:0] row,
+    output logic [1:0] col
 );
 
 always_ff @(posedge clk or posedge reset) begin
     if (reset)
-        address <= 32'd0;
+        address <= 4'd0;
     else if (addressReset)
-        address <= 32'd0;
+        address <= 4'd0;
     else if (addressEnable)
-        address <= address + 32'd4;
+        address <= address + 4'd1;
 end
 
-assign lastAddress = (address == 32'd60);
+assign lastAddress = (address == 4'd16);
+
+assign row = address[3:2];
+assign col = address[1:0];
 
 endmodule
