@@ -4,7 +4,7 @@ module matrixCounter(
     input logic reset,
     input logic countEnable,
 
-    output logic [3:0] count, 
+    output logic [2:0] count, 
     output logic lastCount
 );
 
@@ -18,3 +18,5 @@ always_ff(@posedge clk) begin
     else if (countEnable)
         count <= count + 3'd1;
 end
+
+endmodule

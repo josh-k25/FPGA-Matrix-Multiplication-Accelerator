@@ -2,27 +2,33 @@ module controller(
     input logic clk,
     input logic reset,
     input logic start,
-    input logic lastAddress,
+    input logic lastCol,
+    input logic lastRow,
+    input logic lastK,
 
-    output logic addressEnable,
-    output logic addressReset,
     output logic accumulatorEnable,
     output logic accumulatorClear,
-    output logic writeEnable,
+    output logic rowCount,
+    output logic rowReset,
+    output logic colCount,
+    output logic colReset,
+    output logic kCount,
+    output logic kReset,
+    output logic CWriteEnable,
     output logic done
 );
 
 typedef enum logic [2:0] {
     IDLE,
-    LOAD,
+
     PREP,
-    ACCUMULATE,
-    FINAL,
+    CALCULATE,
+    WRITE,
     DONE
 } stateType;
 
 stateType currentState;
-stateType nextState;
+stateType nextState; 
 
 always_ff @(posedge clk) begin
     if (reset) 
@@ -31,107 +37,118 @@ always_ff @(posedge clk) begin
         currentState <= nextState;
 end
 
-//comb logic for state machine
 always_comb begin
     nextState = currentState;
-    addressEnable = 1'b0;
-    addressReset  = 1'b0;
-    accumulatorClear = 1'b0;
     accumulatorEnable = 1'b0;
-    writeEnable  = 1'b0;
-    done  = 1'b0;
+    accumulatorClear = 1'b0;
+    rowCount = 1'b0;
+    rowReset = 1'b0;
+    colCount = 1'b0;
+    colReset = 1'b0;
+    kCount = 1'b0;
+    kReset = 1'b0;
+    CWriteEnable = 1'b0;
+    done = 1'b0;
 
-    // state machine logic 
     case (currentState)
-        //waiting to start
         IDLE: begin
-            addressEnable = 1'b0;
-            addressReset = 1'b0;
-            accumulatorClear = 1'b0;
             accumulatorEnable = 1'b0;
-            writeEnable = 1'b0;
-            done = 1'b0;
+            accumulatorClear = 1'b0;
+            rowCount = 1'b0;
+            rowReset = 1'b0;
+            colCount = 1'b0;
+            colReset = 1'b0;
+            kCount = 1'b0;
+            kReset = 1'b0;
+            CWriteEnable = 1'b0;
+            done = 1'b0;    
 
             if (start == 1'b1) 
-                nextState = LOAD;
+                nextState = PREP;
             else 
                 nextState = IDLE;
         end
 
-        //loading 0, 1, ... 15
-        LOAD: begin
-            addressEnable = 1'b1;
-            addressReset = 1'b0;
-            accumulatorClear = 1'b0;
-            accumulatorEnable = 1'b0;
-            writeEnable = 1'b1;
-            done = 1'b0;
-
-            if (lastAddress) begin
-                nextState = PREP;
-                addressReset = 1'b1;
-            end
-            else
-                nextState = LOAD;
-        end
-
-        //
+        //reset accumulator
         PREP: begin
-            addressEnable = 1'b1;
-            addressReset = 1'b0;
-            accumulatorClear = 1'b1;
             accumulatorEnable = 1'b0;
-            writeEnable = 1'b0;
-            done = 1'b0;
+            accumulatorClear = 1'b1;
+            rowCount = 1'b0;
+            rowReset = 1'b0;
+            colCount = 1'b0;
+            colReset = 1'b0;
+            kCount = 1'b0;
+            kReset = 1'b0;
+            CWriteEnable = 1'b0;
+            done = 1'b0;  
 
-            nextState = ACCUMULATE;
+            nextState = CALCULATE;
         end
 
-        ACCUMULATE: begin
-            addressEnable = 1'b1;
-            addressReset = 1'b0;
-            accumulatorClear = 1'b0;
+        CALCULATE: begin
             accumulatorEnable = 1'b1;
-            writeEnable = 1'b0;
+            accumulatorClear = 1'b0;
+            rowCount = 1'b0;
+            rowReset = 1'b0;
+            colCount = 1'b0;
+            colReset = 1'b0;
+            kCount = 1'b1;
+            kReset = 1'b0;
+            CWriteEnable = 1'b0;
             done = 1'b0;
 
-            if (lastAddress)
-                nextState = FINAL;
-            else
-                nextState = ACCUMULATE;
+            if (lastK == 0)
+                nextState = CALCULATE;
+            else if (lastK == 1) begin  
+                nextState = WRITE;
+                kCount = 1'b0;
+                kReset = 1'b1;
+            end
         end
 
-        FINAL: begin
-            addressEnable = 1'b0;
-            addressReset = 1'b0;
+        WRITE: begin
+            accumulatorEnable = 1'b0;
             accumulatorClear = 1'b0;
-            accumulatorEnable = 1'b1;
-            writeEnable = 1'b0;
+            rowCount = 1'b0;
+            rowReset = 1'b0;
+            colCount = 1'b0;
+            colReset = 1'b0;
+            kCount = 1'b0;
+            kReset = 1'b0;
+            CWriteEnable = 1'b1;
             done = 1'b0;
 
-            nextState = DONE;
+            if (lastCol && lastRow)
+                nextState = DONE;
+            else if (lastCol) begin
+                rowCount = 1'b1;
+                colReset = 1'b1;
+                nextState = PREP;
+            end
+            else begin
+                colCount = 1'b1;
+                nextState = PREP;
+            end
         end
 
         DONE: begin
-            addressEnable = 1'b0;
-            addressReset = 1'b1;
-            accumulatorClear = 1'b0;
             accumulatorEnable = 1'b0;
-            writeEnable = 1'b0;
+            accumulatorClear = 1'b0;
+            rowCount = 1'b0;
+            rowReset = 1'b1;
+            colCount = 1'b0;
+            colReset = 1'b1;
+            kCount = 1'b0;
+            kReset = 1'b1;
+            CWriteEnable = 1'b0;
             done = 1'b1;
 
             nextState = IDLE;
         end
-    endcase 
+    endcase
 end
 
 endmodule
-
-
-
-
-
-
 
 
 

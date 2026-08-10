@@ -7,13 +7,13 @@ module RAMC(
     output logic [17:0] dataOut
 );
 
-logic [31:0] ramC [0:15];
+logic [17:0] ramC [0:15];
 
 always_ff @(posedge clk) begin
     if (writeEnable)
         ramC[address] <= dataIn;
+end
 
-    else 
-        dataOut <= dataOut[address[3:0]];
+assign dataOut = ramC[address];
 
 endmodule
