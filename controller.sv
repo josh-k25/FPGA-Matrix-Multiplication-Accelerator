@@ -9,11 +9,11 @@ module controller(
     output logic accumulatorEnable,
     output logic accumulatorClear,
     output logic rowCount,
-    output logic rowReset,
+    output logic rowClear,
     output logic colCount,
-    output logic colReset,
+    output logic colClear,
     output logic kCount,
-    output logic kReset,
+    output logic kClear,
     output logic CWriteEnable,
     output logic done
 );
@@ -42,11 +42,11 @@ always_comb begin
     accumulatorEnable = 1'b0;
     accumulatorClear = 1'b0;
     rowCount = 1'b0;
-    rowReset = 1'b0;
+    rowClear = 1'b0;
     colCount = 1'b0;
-    colReset = 1'b0;
+    colClear = 1'b0;
     kCount = 1'b0;
-    kReset = 1'b0;
+    kClear = 1'b0;
     CWriteEnable = 1'b0;
     done = 1'b0;
 
@@ -55,11 +55,11 @@ always_comb begin
             accumulatorEnable = 1'b0;
             accumulatorClear = 1'b0;
             rowCount = 1'b0;
-            rowReset = 1'b0;
+            rowClear = 1'b0;
             colCount = 1'b0;
-            colReset = 1'b0;
+            colClear = 1'b0;
             kCount = 1'b0;
-            kReset = 1'b0;
+            kClear = 1'b0;
             CWriteEnable = 1'b0;
             done = 1'b0;    
 
@@ -74,11 +74,11 @@ always_comb begin
             accumulatorEnable = 1'b0;
             accumulatorClear = 1'b1;
             rowCount = 1'b0;
-            rowReset = 1'b0;
+            rowClear = 1'b0;
             colCount = 1'b0;
-            colReset = 1'b0;
+            colClear = 1'b0;
             kCount = 1'b0;
-            kReset = 1'b0;
+            kClear = 1'b0;
             CWriteEnable = 1'b0;
             done = 1'b0;  
 
@@ -89,11 +89,11 @@ always_comb begin
             accumulatorEnable = 1'b1;
             accumulatorClear = 1'b0;
             rowCount = 1'b0;
-            rowReset = 1'b0;
+            rowClear = 1'b0;
             colCount = 1'b0;
-            colReset = 1'b0;
+            colClear = 1'b0;
             kCount = 1'b1;
-            kReset = 1'b0;
+            kClear = 1'b0;
             CWriteEnable = 1'b0;
             done = 1'b0;
 
@@ -102,7 +102,7 @@ always_comb begin
             else if (lastK == 1) begin  
                 nextState = WRITE;
                 kCount = 1'b0;
-                kReset = 1'b1;
+                kClear = 1'b1;
             end
         end
 
@@ -110,11 +110,11 @@ always_comb begin
             accumulatorEnable = 1'b0;
             accumulatorClear = 1'b0;
             rowCount = 1'b0;
-            rowReset = 1'b0;
+            rowClear = 1'b0;
             colCount = 1'b0;
-            colReset = 1'b0;
+            colClear = 1'b0;
             kCount = 1'b0;
-            kReset = 1'b0;
+            kClear = 1'b0;
             CWriteEnable = 1'b1;
             done = 1'b0;
 
@@ -122,7 +122,7 @@ always_comb begin
                 nextState = DONE;
             else if (lastCol) begin
                 rowCount = 1'b1;
-                colReset = 1'b1;
+                colClear = 1'b1;
                 nextState = PREP;
             end
             else begin
@@ -135,11 +135,11 @@ always_comb begin
             accumulatorEnable = 1'b0;
             accumulatorClear = 1'b0;
             rowCount = 1'b0;
-            rowReset = 1'b1;
+            rowClear = 1'b1;
             colCount = 1'b0;
-            colReset = 1'b1;
+            colClear = 1'b1;
             kCount = 1'b0;
-            kReset = 1'b1;
+            kClear = 1'b1;
             CWriteEnable = 1'b0;
             done = 1'b1;
 

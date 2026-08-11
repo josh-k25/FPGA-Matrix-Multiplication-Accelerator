@@ -1,8 +1,5 @@
-module RAMA(
-    input logic clk,
-    input logic writeEnable,
+module ROMA(
     input logic [3:0] address,
-    input logic [7:0] dataIn,
 
     output logic [7:0] dataOut
 );
@@ -30,10 +27,6 @@ initial begin
     ramA[14] = 8'd15;
     ramA[15] = 8'd16;
 end
-
-always_ff @(posedge clk)
-    if (writeEnable)
-        ramA[address] <= dataIn;
 
 assign dataOut = ramA[address];
 

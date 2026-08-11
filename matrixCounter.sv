@@ -10,13 +10,16 @@ module matrixCounter(
 
 assign lastCount = (count == 4'd3);
 
-always_ff(@posedge clk) begin
-    if (reset)
+always_ff @(posedge clk) begin
+    if (reset) begin
         count <= 3'd0;
-    else if (clear)
+    end
+    else if (clear) begin
         count <= 3'd0;
-    else if (countEnable)
+    end
+    else if (countEnable) begin
         count <= count + 3'd1;
+    end
 end
 
 endmodule
