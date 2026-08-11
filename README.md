@@ -10,17 +10,17 @@ The next stage of the project is an output-stationary systolic array implementat
 
 The current implementation computes:
 
-\[
+$$
 C = A \times B
-\]
+$$
 
 for two 4×4 matrices.
 
 Each output element is calculated as:
 
-\[
-C_{ij} = \sum_{k=0}^{3} A_{ik}B_{kj}
-\]
+$$
+C_{ij} = \sum_{k=0}^{3} A_{ik} B_{kj}
+$$
 
 A single MAC datapath is reused across all 16 output elements. Three counters track the current row `i`, column `j`, and inner-product index `k`.
 
@@ -36,17 +36,17 @@ A single MAC datapath is reused across all 16 output elements. Three counters tr
 
 Memory addresses are generated as:
 
-\[
+$$
 A[i][k] = 4i + k
-\]
+$$
 
-\[
+$$
 B[k][j] = 4k + j
-\]
+$$
 
-\[
+$$
 C[i][j] = 4i + j
-\]
+$$
 
 ### Controller
 
