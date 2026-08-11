@@ -23,9 +23,13 @@ logic kClear;
 logic CWriteEnable;
 
 //ROM signals
-logic [3:0] address;
+logic [3:0] addressA;
+logic [3:0] addressB;
+logic [3:0] addressC;
 logic [7:0] dataA;
 logic [7:0] dataB;
+logic [17:0] dataInC;
+logic [17:0] dataOutC;
 
 //i matrixCounter 
 logic [2:0] i;
@@ -61,20 +65,27 @@ controller controller(
 );
 
 ROMA ROMA(
-    .address(address),
+    .address(addressA),
     .dataOut(dataA)
 );
 
 ROMB ROMB(
-    .address(address),
+    .address(addressB),
     .dataOut(dataB)
 );
 
+RAMC RAMC(
+    .clk(clk),
+    .writeEnable(CWriteEnable),
+    .address(addressC),
+    .dataIn(dataInC),
+    .dataOut(dataOutC)
+);
 
 matrixCounter iCounter(
     .clk(clk),
     .clear(rowClear),
-    .reset(rest),
+    .reset(reset),
     .countEnable(rowCount),
     .count(i),
     .lastCount(lastRow)
@@ -93,7 +104,7 @@ matrixCounter kCounter(
     .clk(clk),
     .clear(kClear),
     .reset(reset),
-    .countEnable(countEnable),
+    .countEnable(kCount),
     .count(k),
     .lastCount(lastK)
 );
@@ -112,5 +123,12 @@ accumulator accumulator(
     .product(product),
     .sum(sum)
 );
+
+assign addressA = (i * 4) + k;
+assign addressB = (k * 4) + j;
+assign addressC = (i * 4) + j;
+
+assign dataInC = sum;
+assign result = dataOutC;
 
 endmodule
