@@ -1,4 +1,6 @@
-module processingElement (
+module processingElement #(
+        parameter sum_width = 16 +  $clog2(N)
+    )(
     input logic clk,
     input logic clear,
     input logic reset,
@@ -11,7 +13,7 @@ module processingElement (
     output logic [7:0] dataOutB,
     output logic AValidOut,
     output logic BValidOut,
-    output logic [17:0] sum
+    output logic [sum_width - 1:0] sum
 );
 
 always_ff @(posedge clk) begin

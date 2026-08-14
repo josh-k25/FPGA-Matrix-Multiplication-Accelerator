@@ -1,6 +1,6 @@
 module systolicArrayNxN #(
-    parameter int N = 2,
-    parameter int SUM_WIDTH = 16 + $clog2(N)
+    parameter int N = 4,
+    parameter int sum_width = 16 + $clog2(N)
     )(
     input logic clk,
     input logic reset,
@@ -12,7 +12,7 @@ module systolicArrayNxN #(
     input logic AValidIn [0:N-1],
     input logic BValidIn [0:N-1],
 
-    output logic [N-1:0][N-1:0][SUM_WIDTH-1:0] sum
+    output logic [N-1:0][N-1:0][sum_width-1:0] sum
 );
 
 logic [7:0] A_link [0:N-1][0:N];
@@ -37,7 +37,9 @@ generate
 
     for (r = 0; r < N; r = r + 1) begin : rows
         for (c = 0; c < N; c = c + 1) begin : cols
-            processingElement PE(
+            processingElement #(
+                .sum_width(sum_width)
+            ) PE (
                 .clk(clk),
                 .clear(clear),
                 .reset(reset),

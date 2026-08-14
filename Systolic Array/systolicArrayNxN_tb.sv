@@ -3,7 +3,7 @@
 module systolicArrayNxN_tb;
 
 localparam int N = 2;
-localparam int SUM_WIDTH = 16 + $clog2(N);
+localparam int sum_width = 16 + $clog2(N);
 
 logic clk;
 logic reset;
@@ -15,7 +15,7 @@ logic [7:0] dataInB [0:N-1];
 logic AValidIn [0:N-1];
 logic BValidIn [0:N-1];
 
-logic [N-1:0][N-1:0][SUM_WIDTH - 1:0] sum;
+logic [N-1:0][N-1:0][sum_width - 1:0] sum;
 
 systolicArrayNxN #(
     .N(N)
