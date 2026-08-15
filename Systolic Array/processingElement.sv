@@ -1,5 +1,5 @@
 module processingElement #(
-        parameter sum_width = 16 +  $clog2(N)
+        parameter int sum_width = 18
     )(
     input logic clk,
     input logic clear,
@@ -19,10 +19,10 @@ module processingElement #(
 always_ff @(posedge clk) begin
 
     if (reset) begin
-        sum <= 18'b0;
+        sum <= '0;
     end
     else if (clear) begin
-        sum <= 18'b0;
+        sum <= '0;
     end
     else if (AValidIn && BValidIn) begin
         sum <= sum + (dataInA * dataInB);

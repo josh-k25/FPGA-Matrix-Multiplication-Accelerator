@@ -463,3 +463,5 @@ initial begin
     $display("All tests passed.");
     $finish;
 end
+
+endmodule
