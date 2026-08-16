@@ -3,18 +3,17 @@ module dataSkewer #(
 )(
     input logic clk,
     input logic reset,
+    input logic [N-1:0][7:0] rawA,
+    input logic [N-1:0][7:0] rawB,
 
-    input logic [7:0] rawA [0:N-1],
-    input logic [7:0] rawB [0:N-1],
+    input logic [N-1:0] rawAValid,
+    input logic [N-1:0] rawBValid,
 
-    input logic rawAValid [0:N-1],
-    input logic rawBValid [0:N-1],
+    output logic [N-1:0][7:0] skewedA,
+    output logic [N-1:0][7:0] skewedB,
 
-    output logic [7:0] skewedA [0:N-1],
-    output logic [7:0] skewedB [0:N-1],
-
-    output logic skewedAValid [0:N-1],
-    output logic skewedBValid [0:N-1]
+    output logic [N-1:0] skewedAValid,
+    output logic [N-1:0] skewedBValid
 );
 
 logic [7:0] A_delay [0:N-1][0:N-1];
@@ -26,7 +25,7 @@ logic BValid_delay [0:N-1][0:N-1];
 genvar lane;
 
 generate
-    for (lane = 0; lane < N; lane = lane + 1) begin : lane
+    for (lane = 0; lane < N; lane = lane + 1) begin : gen_lane
         if (lane == 0) begin
             //lane 0 no delay
             assign skewedA[lane] = rawA[lane];
