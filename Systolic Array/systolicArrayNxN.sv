@@ -6,11 +6,11 @@ module systolicArrayNxN #(
     input logic reset,
     input logic clear,
 
-    input logic [7:0] dataInA [0:N-1],
-    input logic [7:0] dataInB [0:N-1],
+    input logic [N-1:0][7:0] dataInA,
+    input logic [N-1:0][7:0] dataInB,
 
-    input logic AValidIn [0:N-1],
-    input logic BValidIn [0:N-1],
+    input logic [N-1:0] AValidIn,
+    input logic [N-1:0] BValidIn,
 
     output logic [N-1:0][N-1:0][sum_width-1:0] sum
 );

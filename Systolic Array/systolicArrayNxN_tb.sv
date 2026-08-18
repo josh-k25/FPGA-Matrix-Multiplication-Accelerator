@@ -9,11 +9,11 @@ logic clk;
 logic reset;
 logic clear;
 
-logic [7:0] dataInA [0:N-1];
-logic [7:0] dataInB [0:N-1];
+logic [N-1:0][7:0] dataInA;
+logic [N-1:0][7:0] dataInB;
 
-logic AValidIn [0:N-1];
-logic BValidIn [0:N-1];
+logic [N-1:0] AValidIn;
+logic [N-1:0] BValidIn;
 
 logic [N-1:0][N-1:0][sum_width - 1:0] sum;
 

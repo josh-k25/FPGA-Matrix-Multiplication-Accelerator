@@ -1,0 +1,128 @@
+`timescale 1ns/1ps
+
+module accelerator_tb;
+
+localparam int N = 4;
+localparam int sum_width = 16 + $clog2(N);
+
+logic clk;
+logic reset;
+logic start;
+
+logic [N-1:0][N-1:0][7:0] matrixA;
+logic [N-1:0][N-1:0][7:0] matrixB;
+
+logic done;
+logic [N-1:0][N-1:0][sum_width-1:0] result;
+
+accelerator #(
+    .N(N),
+    .sum_width(sum_width)
+) dut (
+    .clk(clk),
+    .reset(reset),
+    .start(start),
+    .matrixA(matrixA),
+    .matrixB(matrixB),
+    .done(done),
+    .result(result)
+);
+
+always #5 clk = ~clk;
+
+initial begin
+    //reset accelerator
+    clk = 1'b0;
+    reset = 1'b1;
+    start = 1'b0;
+
+    matrixA = '0;
+    matrixB = '0;
+
+    @(posedge clk);
+    #1;
+
+    reset = 1'b0;
+
+    matrixA = {
+        8'd16, 8'd15, 8'd14, 8'd13,
+        8'd12, 8'd11, 8'd10, 8'd9,
+        8'd8, 8'd7, 8'd6, 8'd5,
+        8'd4, 8'd3, 8'd2, 8'd1
+    };
+
+    matrixB = {
+        8'd16, 8'd15, 8'd14, 8'd13,
+        8'd12, 8'd11, 8'd10, 8'd9,
+        8'd8, 8'd7, 8'd6, 8'd5,
+        8'd4, 8'd3, 8'd2, 8'd1
+    };
+
+    start = 1'b1;
+
+    @(posedge clk);
+    #1;
+
+    start = 1'b0;
+
+    wait (done == 1'b1);
+    #1;
+
+    if (result[0][0] !== 18'd90)
+        $fatal(1, "result[0][0] failed.");
+
+    if (result[0][1] !== 18'd100)
+        $fatal(1, "result[0][1] failed.");
+
+    if (result[0][2] !== 18'd110)
+        $fatal(1, "result[0][2] failed.");
+
+    if (result[0][3] !== 18'd120)
+        $fatal(1, "result[0][3] failed.");
+
+
+    if (result[1][0] !== 18'd202)
+        $fatal(1, "result[1][0] failed.");
+
+    if (result[1][1] !== 18'd228)
+        $fatal(1, "result[1][1] failed.");
+
+    if (result[1][2] !== 18'd254)
+        $fatal(1, "result[1][2] failed.");
+
+    if (result[1][3] !== 18'd280)
+        $fatal(1, "result[1][3] failed.");
+
+
+    if (result[2][0] !== 18'd314)
+        $fatal(1, "result[2][0] failed.");
+
+    if (result[2][1] !== 18'd356)
+        $fatal(1, "result[2][1] failed.");
+
+    if (result[2][2] !== 18'd398)
+        $fatal(1, "result[2][2] failed.");
+
+    if (result[2][3] !== 18'd440)
+        $fatal(1, "result[2][3] failed.");
+
+
+    if (result[3][0] !== 18'd426)
+        $fatal(1, "result[3][0] failed.");
+
+    if (result[3][1] !== 18'd484)
+        $fatal(1, "result[3][1] failed.");
+
+    if (result[3][2] !== 18'd542)
+        $fatal(1, "result[3][2] failed.");
+
+    if (result[3][3] !== 18'd600)
+        $fatal(1, "result[3][3] failed.");
+
+
+    $display("All accelerator tests passed.");
+    $finish;
+
+end
+
+endmodule
