@@ -35,27 +35,58 @@ initial begin
 
     wait(done);
 
-    $display("Matrix multiplication finished");
-    $display("C[0][0] = %0d", dut.RAMC.ramC[0]);
-    $display("C[0][1] = %0d", dut.RAMC.ramC[1]);
-    $display("C[0][2] = %0d", dut.RAMC.ramC[2]);
-    $display("C[0][3] = %0d", dut.RAMC.ramC[3]);
+    if (dut.RAMC.ramC[0] !== 18'd90)
+        $fatal(1, "C[0][0] failed.");
 
-    $display("C[1][0] = %0d", dut.RAMC.ramC[4]);
-    $display("C[1][1] = %0d", dut.RAMC.ramC[5]);
-    $display("C[1][2] = %0d", dut.RAMC.ramC[6]);
-    $display("C[1][3] = %0d", dut.RAMC.ramC[7]);
+    if (dut.RAMC.ramC[1] !== 18'd100)
+        $fatal(1, "C[0][1] failed.");
 
-    $display("C[2][0] = %0d", dut.RAMC.ramC[8]);
-    $display("C[2][1] = %0d", dut.RAMC.ramC[9]);
-    $display("C[2][2] = %0d", dut.RAMC.ramC[10]);
-    $display("C[2][3] = %0d", dut.RAMC.ramC[11]);
+    if (dut.RAMC.ramC[2] !== 18'd110)
+        $fatal(1, "C[0][2] failed.");
 
-    $display("C[3][0] = %0d", dut.RAMC.ramC[12]);
-    $display("C[3][1] = %0d", dut.RAMC.ramC[13]);
-    $display("C[3][2] = %0d", dut.RAMC.ramC[14]);
-    $display("C[3][3] = %0d", dut.RAMC.ramC[15]);
+    if (dut.RAMC.ramC[3] !== 18'd120)
+        $fatal(1, "C[0][3] failed.");
 
+
+    if (dut.RAMC.ramC[4] !== 18'd202)
+        $fatal(1, "C[1][0] failed.");
+
+    if (dut.RAMC.ramC[5] !== 18'd228)
+        $fatal(1, "C[1][1] failed.");
+
+    if (dut.RAMC.ramC[6] !== 18'd254)
+        $fatal(1, "C[1][2] failed.");
+
+    if (dut.RAMC.ramC[7] !== 18'd280)
+        $fatal(1, "C[1][3] failed.");
+
+
+    if (dut.RAMC.ramC[8] !== 18'd314)
+        $fatal(1, "C[2][0] failed.");
+
+    if (dut.RAMC.ramC[9] !== 18'd356)
+        $fatal(1, "C[2][1] failed.");
+
+    if (dut.RAMC.ramC[10] !== 18'd398)
+        $fatal(1, "C[2][2] failed.");
+
+    if (dut.RAMC.ramC[11] !== 18'd440)
+        $fatal(1, "C[2][3] failed.");
+
+
+    if (dut.RAMC.ramC[12] !== 18'd426)
+        $fatal(1, "C[3][0] failed.");
+
+    if (dut.RAMC.ramC[13] !== 18'd484)
+        $fatal(1, "C[3][1] failed.");
+
+    if (dut.RAMC.ramC[14] !== 18'd542)
+        $fatal(1, "C[3][2] failed.");
+
+    if (dut.RAMC.ramC[15] !== 18'd600)
+        $fatal(1, "C[3][3] failed.");
+
+    $display("All single-MAC matrix multiplication tests passed.");
     #20;
     $finish;
 end

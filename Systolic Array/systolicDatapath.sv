@@ -1,4 +1,4 @@
-module datapath #(
+module systolicDatapath #(
     parameter int N = 4,
     parameter int sum_width = 16 + $clog2(N)
 )(
@@ -19,10 +19,11 @@ module datapath #(
 );
 
 //cycles needed to completely drain the pipeline
+localparam int K_WIDTH = (N <= 1) ? 1 : $clog2(N);
 localparam int DRAIN_CYCLES = 2*N - 2;
-localparam int DRAIN_WIDTH  = $clog2(DRAIN_CYCLES + 1);
+localparam int DRAIN_WIDTH  = (DRAIN_CYCLES <= 0) ? 1 : $clog2(DRAIN_CYCLES + 1);
 
-logic [$clog2(N)-1:0] k;
+logic [K_WIDTH-1:0] k;
 logic [DRAIN_WIDTH-1:0] drain;
 
 logic [N-1:0][7:0] rawA;

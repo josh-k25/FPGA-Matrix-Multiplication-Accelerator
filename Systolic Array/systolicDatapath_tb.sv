@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 
-module datapath_tb;
+module systolicDatapath_tb;
 
 localparam int N = 4;
 localparam int sum_width = 16 + $clog2(N);
@@ -20,7 +20,7 @@ logic lastK;
 logic lastDrain;
 logic [N-1:0][N-1:0][sum_width-1:0] result;
 
-datapath #(
+systolicDatapath #(
     .N(N),
     .sum_width(sum_width)
 ) dut (
