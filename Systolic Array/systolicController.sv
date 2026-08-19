@@ -1,6 +1,4 @@
-module systolicController #(
-    parameter int N = 4
-)(
+module systolicController (
     input logic clk,
     input logic reset,
     input logic start,

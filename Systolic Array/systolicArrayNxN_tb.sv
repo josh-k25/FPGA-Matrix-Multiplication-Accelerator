@@ -58,7 +58,7 @@ initial begin
     @(posedge clk);
     #1;
 
-    if (sum[0][0] !== 18'd5)
+    if (sum[0][0] !== 17'd5)
         $fatal(1, "sum[0][0] clock cycle 1 failed.");
 
     dataInA[0] = 8'd2;
@@ -74,13 +74,13 @@ initial begin
     @(posedge clk);
     #1;
 
-    if (sum[0][0] !== 18'd19)
+    if (sum[0][0] !== 17'd19)
         $fatal(1, "sum[0][0] clock cycle 2 failed.");
     
-    if (sum[1][0] !== 18'd20)
+    if (sum[1][0] !== 17'd20)
         $fatal(1, "sum[1][0] clock cycle 2 failed.");
 
-    if (sum[0][1] !== 18'd10)
+    if (sum[0][1] !== 17'd10)
         $fatal(1, "sum[0][1] clock cycle 2 failed.");
     
     dataInA[1]  = 8'd20;
@@ -93,19 +93,19 @@ initial begin
     @(posedge clk);
     #1;
 
-    if (sum[1][0] !== 18'd160)
+    if (sum[1][0] !== 17'd160)
         $fatal(1, "sum[1][0] clock cycle 3 failed.");
     
-    if (sum[0][1] !== 18'd50)
+    if (sum[0][1] !== 17'd50)
         $fatal(1, "sum[0][1] clock cycle 3 failed.");
 
-    if (sum[1][1] !== 18'd40)
+    if (sum[1][1] !== 17'd40)
         $fatal(1, "sum[1][1] clock cycle 3 failed.");
 
     @(posedge clk);
     #1;
 
-    if (sum[1][1] !== 18'd440)
+    if (sum[1][1] !== 17'd440)
         $fatal(1, "sum[1][1] clock cycle 4 failed.");
 
     $display("All tests passed.");

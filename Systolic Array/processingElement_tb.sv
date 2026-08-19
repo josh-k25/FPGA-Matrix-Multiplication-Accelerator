@@ -83,6 +83,7 @@ initial begin
     if (sum !== 18'd26)
         $fatal(1, "AValidIn low failed.");
 
+    AValidIn = 1'b1;
     BValidIn = 1'b0;
 
     @(posedge clk);

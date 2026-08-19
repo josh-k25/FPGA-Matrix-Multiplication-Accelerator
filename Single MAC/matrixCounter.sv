@@ -8,7 +8,7 @@ module matrixCounter(
     output logic lastCount
 );
 
-assign lastCount = (count == 4'd3);
+assign lastCount = (count == 3'd3);
 
 always_ff @(posedge clk) begin
     if (reset) begin

@@ -239,18 +239,6 @@ This design gives a simpler sequential version to compare against the systolic a
 
 ## RISC-V Baseline Comparison
 
-A future part of the project will compare the hardware accelerators against matrix multiplication running as software on a RISC-V processor.
-
-The RISC-V processor will support hardware multiplication using the `M` extension.
-
-The goal is to compare:
-
-1. RISC-V software matrix multiplication
-2. Single-MAC hardware accelerator
-3. Systolic array accelerator
-
-## RISC-V Baseline Comparison
-
 A future part of the project will compare the hardware accelerators against matrix multiplication running on a RISC-V processor.
 
 The goal is to compare:
@@ -267,7 +255,7 @@ The program will use nested loops to calculate each output element:
 
 C[i][j] = A[i][0]B[0][j] + A[i][1]B[1][j] + ... + A[i][N-1]B[N-1][j]
 
-The processor will perform the required loads, address calculations, multiplication, accumulation, loop control, and stores using normal RISC-V instructions.
+The processor will perform the required loads, address calculations, multiplication, accumulation, loop control, and stores using RISC-V instructions.
 
 The RISC-V processor will be extended with hardware multiply (`MUL`) support before performing the comparison.
 
@@ -281,6 +269,8 @@ The implementations can be compared using measurements such as:
 - How the designs scale as the matrix size increases
 
 The purpose of the comparison is to see how the same matrix multiplication behaves when executed instruction-by-instruction on a processor, using one dedicated MAC unit, and using many processing elements in parallel.
+
+---
 
 ## Verification
 
@@ -429,7 +419,8 @@ Implemented:
 
 Planned:
 
-- RISC-V software comparison
+- RISC-V assembly comparison
+- Hardware `MUL` support for the RISC-V processor
 - FPGA synthesis and resource usage results
 - Cycle-count comparison between the single-MAC and systolic designs
 - Performance comparison between the RISC-V, single-MAC, and systolic implementations
