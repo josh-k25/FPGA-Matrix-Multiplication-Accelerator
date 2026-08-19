@@ -15,9 +15,6 @@ logic [N-1:0][N-1:0][7:0] matrixB;
 logic done;
 logic [N-1:0][N-1:0][sum_width-1:0] result;
 
-//expected for random verification
-logic [N-1:0][N-1:0][sum_width-1:0] expected;
-
 accelerator #(
     .N(N),
     .sum_width(sum_width)
@@ -312,9 +309,6 @@ initial begin
     #1;
 
     start = 1'b0;
-
-    wait (done == 1'b1);
-    #1;
 
     wait (done == 1'b1);
     #1;

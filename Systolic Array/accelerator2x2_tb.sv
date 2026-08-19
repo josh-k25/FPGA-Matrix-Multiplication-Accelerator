@@ -55,10 +55,10 @@ initial begin
     matrixB[1][0] = 8'd7;
     matrixB[1][1] = 8'd8;
 
-    @(posedge clk);
+    @(negedge clk);
     start = 1;
 
-    @(posedge clk);
+    @(negedge clk);
     start = 0;
 
     wait(done);

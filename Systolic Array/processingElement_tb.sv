@@ -51,6 +51,9 @@ initial begin
     if (AValidOut !== 1'b0)
         $fatal(1, "Initial reset failed (AValidOut).");
 
+    if (BValidOut !== 1'b0)
+        $fatal(1, "Initial reset failed (BValidOut).");
+
     reset = 1'b0;
     dataInA = 8'd2;
     dataInB = 8'd3;
