@@ -92,8 +92,12 @@ initial begin
     if (sum !== 18'd26)
         $fatal(1, "BValidIn low failed.");
 
+    AValidIn = 1'b0;
+    BValidIn = 1'b0;
+
     @(posedge clk)
     #1;
+
     if (sum !== 18'd26)
         $fatal(1, "A and BValid in low failed.");
 
