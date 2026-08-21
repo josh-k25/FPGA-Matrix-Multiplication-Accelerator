@@ -1,10 +1,13 @@
-module datapath(
+module datapath#(
+    parameter int N = 4,
+    parameter int SUM_WIDTH = 16 + $clog2(N)
+    )(
     input logic clk,
     input logic reset,
     input logic start,
 
     output logic done,
-    output logic [17:0] result
+    output logic [SUM_WIDTH - 1:0] result
 );
 
 //controller signals
@@ -22,29 +25,34 @@ logic kCount;
 logic kClear;
 logic CWriteEnable;
 
-//ROM signals
-logic [3:0] addressA;
-logic [3:0] addressB;
-logic [3:0] addressC;
+localparam int INDEX_WIDTH = $clog2(N);
+localparam int ADDR_WIDTH  = $clog2(N*N);
+
+//RAM signals
+logic [ADDR_WIDTH-1:0] addressA;
+logic [ADDR_WIDTH-1:0] addressB;
+logic [ADDR_WIDTH-1:0] addressC;
+
 logic [7:0] dataA;
 logic [7:0] dataB;
-logic [17:0] dataInC;
-logic [17:0] dataOutC;
 
-//i matrixCounter 
-logic [2:0] i;
+logic [SUM_WIDTH-1:0] dataInC;
+logic [SUM_WIDTH-1:0] dataOutC;
 
-//j matrixCounter 
-logic [2:0] j;
+//i matrixCounter
+logic [INDEX_WIDTH-1:0] i;
+
+//j matrixCounter
+logic [INDEX_WIDTH-1:0] j;
 
 //k matrixCounter
-logic [2:0] k;
+logic [INDEX_WIDTH-1:0] k;
 
+//multiplier
 logic [15:0] product;
 
 //accumulator
-logic [17:0] sum;
-
+logic [SUM_WIDTH-1:0] sum;
 controller controller(
     .clk(clk),
     .reset(reset),
@@ -64,17 +72,24 @@ controller controller(
     .done(done)
 );
 
-ROMA ROMA(
+RAMA #(
+    .N(N)
+    ) RAMA(
     .address(addressA),
     .dataOut(dataA)
 );
 
-ROMB ROMB(
+RAMB #(
+    .N(N)
+    ) RAMB (
     .address(addressB),
     .dataOut(dataB)
 );
 
-RAMC RAMC(
+RAMC #(
+    .N(N),
+    .SUM_WIDTH(SUM_WIDTH)
+    ) RAMC(
     .clk(clk),
     .writeEnable(CWriteEnable),
     .address(addressC),
@@ -82,7 +97,9 @@ RAMC RAMC(
     .dataOut(dataOutC)
 );
 
-matrixCounter iCounter(
+matrixCounter #(
+    .N(N)
+) iCounter(
     .clk(clk),
     .clear(rowClear),
     .reset(reset),
@@ -91,7 +108,9 @@ matrixCounter iCounter(
     .lastCount(lastRow)
 );
 
-matrixCounter jCounter(
+matrixCounter #(
+    .N(N)
+) jCounter(
     .clk(clk),
     .clear(colClear),
     .reset(reset),
@@ -100,7 +119,9 @@ matrixCounter jCounter(
     .lastCount(lastCol)
 );
 
-matrixCounter kCounter(
+matrixCounter #(
+    .N(N)
+) kCounter(
     .clk(clk),
     .clear(kClear),
     .reset(reset),
@@ -115,7 +136,10 @@ multiplier multiplier(
     .result(product)
 );
 
-accumulator accumulator(
+accumulator #(
+    .N(N),
+    .WIDTH(SUM_WIDTH)
+    ) accumulator (
     .clk(clk),
     .accumulatorClear(accumulatorClear),
     .accumulatorEnable(accumulatorEnable),
@@ -124,9 +148,9 @@ accumulator accumulator(
     .sum(sum)
 );
 
-assign addressA = (i * 4) + k;
-assign addressB = (k * 4) + j;
-assign addressC = (i * 4) + j;
+assign addressA = (i * N) + k;
+assign addressB = (k * N) + j;
+assign addressC = (i * N) + j;
 
 assign dataInC = sum;
 assign result = dataOutC;

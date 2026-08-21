@@ -25,9 +25,7 @@ logic drainClear;
 logic lastK;
 logic lastDrain;
 
-systolicController #(
-    .N(N)
-) controller_inst (
+systolicController systolicController(
     .clk(clk),
     .reset(reset),
     .start(start),
@@ -47,7 +45,7 @@ systolicController #(
 systolicDatapath #(
     .N(N),
     .sum_width(sum_width)
-) datapath_inst (
+) systolicDatapath (
     .clk(clk),
     .reset(reset),
 

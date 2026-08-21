@@ -1,24 +1,26 @@
-module matrixCounter(
+module matrixCounter #(
+    parameter int N = 4,
+    parameter int WIDTH = $clog2(N)
+    )(
     input logic clk,
     input logic clear,
     input logic reset,
     input logic countEnable,
 
-    output logic [2:0] count, 
+    output logic [WIDTH - 1:0] count, 
     output logic lastCount
 );
 
-assign lastCount = (count == 3'd3);
+assign lastCount = (count == N-1);
 
 always_ff @(posedge clk) begin
-    if (reset) begin
-        count <= 3'd0;
-    end
-    else if (clear) begin
-        count <= 3'd0;
-    end
+    if (reset || clear)
+        count <= '0;
     else if (countEnable) begin
-        count <= count + 3'd1;
+        if (count == N-1)
+            count <= '0;
+        else
+            count <= count + 1'b1;
     end
 end
 

@@ -1,12 +1,14 @@
-module accumulator(
+module accumulator #(
+    parameter int N = 4,
+    parameter int WIDTH = 16 + $clog2(N)
+    )(
     input logic clk,
     input logic accumulatorClear,
     input logic accumulatorEnable,
     input logic reset,
     input logic [15:0] product,
 
-    //18 bits since 8 bit x 8 bit is 16 bits and sum needs to hold 4 x 16 bits 
-    output logic [17:0] sum
+    output logic [WIDTH-1:0] sum
 );
 
 always_ff @(posedge clk or posedge reset) begin
