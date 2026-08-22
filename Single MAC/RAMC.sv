@@ -11,7 +11,7 @@ module RAMC#(
     output logic [SUM_WIDTH-1:0] dataOut
 );
 
-logic [17:0] ramC [0:N*N - 1];
+logic [SUM_WIDTH-1:0] ramC [0:N*N-1];
 
 always_ff @(posedge clk) begin
     if (writeEnable)
