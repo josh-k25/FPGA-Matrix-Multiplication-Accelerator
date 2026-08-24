@@ -1,5 +1,5 @@
 module datapath#(
-    parameter int N = 4,
+    parameter int N = 8,
     parameter int SUM_WIDTH = 16 + $clog2(N)
     )(
     input logic clk,
