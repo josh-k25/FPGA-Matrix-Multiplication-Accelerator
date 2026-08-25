@@ -1,10 +1,10 @@
 # FPGA Matrix Multiplication Accelerator
 
-A SystemVerilog implementation of matrix multiplication using both a **single-MAC design** and a **parameterized systolic array**.
+A SystemVerilog implementation of matrix multiplication using both a **parameterized single-MAC design** and a **parameterized systolic array**.
 
 The project was built to compare a design that reuses one multiply-accumulate unit with a design that uses many processing elements (PEs) to perform calculations in parallel.
 
-The current systolic accelerator supports square `N × N` matrices and can be configured for different matrix sizes using the parameter `N`.
+Both accelerators support square `N × N` matrices and can be configured for different matrix sizes using the parameter `N`.
 
 ---
 
@@ -24,19 +24,19 @@ $$
 
 Matrix elements are 8-bit unsigned integers.
 
-The systolic design uses an accumulator width of
+The accelerator designs use an accumulator width of
 
 $$
 16 + \lceil \log_2(N) \rceil
 $$
 
-bits so that each PE can store the sum of `N` 8-bit × 8-bit products.
+bits so that the sum of `N` 8-bit × 8-bit products can be stored without overflow for the supported unsigned inputs.
 
 ---
 
 ## Systolic Array Architecture
 
-The main implementation is a parameterized `N × N` systolic array.
+The main implementation is a parameterized `N × N` output-stationary systolic array.
 
 Each output element `C[i][j]` is calculated by one processing element. Each PE keeps its own running sum while A and B values move through the array.
 
@@ -103,6 +103,8 @@ Each PE:
 - Passes the valid signals along with the data
 
 Each PE eventually produces one element of the output matrix.
+
+Because each output value remains in its assigned PE while being accumulated, the array uses an **output-stationary** dataflow.
 
 ---
 
@@ -201,7 +203,7 @@ Sets `done` high for one cycle before returning to `IDLE`.
 
 ## Single-MAC Baseline
 
-The repository also includes a 4×4 matrix multiplier that uses one multiplier and one accumulator.
+The repository also includes a parameterized `N × N` matrix multiplier that uses one multiplier and one accumulator.
 
 Instead of having many PEs working at the same time, this design reuses the same multiplier and accumulator for every output element.
 
@@ -214,16 +216,23 @@ Three counters track:
 Memory addresses are generated as:
 
 $$
-A[i][k] = 4i + k
+A[i][k] = iN + k
 $$
 
 $$
-B[k][j] = 4k + j
+B[k][j] = kN + j
 $$
 
 $$
-C[i][j] = 4i + j
+C[i][j] = iN + j
 $$
+
+The matrix size and accumulator width are parameterized using:
+
+```systemverilog
+parameter int N = 4
+parameter int SUM_WIDTH = 16 + $clog2(N)
+```
 
 The controller uses five states:
 
@@ -231,44 +240,92 @@ The controller uses five states:
 IDLE -> PREP -> CALCULATE -> WRITE -> DONE
 ```
 
-The input matrices are stored in ROM and the completed results are written to RAM.
+The input matrices are stored in the `RAMA` and `RAMB` arrays and completed output elements are written to `RAMC`.
 
-This design gives a simpler sequential version to compare against the systolic array.
+This design gives a simpler sequential version to compare against the parallel systolic array.
 
 ---
 
 ## RISC-V Baseline Comparison
 
-A future part of the project will compare the hardware accelerators against matrix multiplication running on a RISC-V processor.
+The hardware accelerators were compared against matrix multiplication running in RISC-V assembly on a separate 32-bit five-stage pipelined RISC-V processor.
 
-The goal is to compare:
-
-1. RISC-V assembly matrix multiplication
-2. Single-MAC hardware accelerator
-3. Systolic array accelerator
+The processor supports a subset of RV32I plus the `MUL` instruction from the RISC-V M extension.
 
 ### RISC-V Matrix Multiplication
 
-Matrix multiplication will be implemented directly in RISC-V assembly.
+Matrix multiplication is implemented directly in RISC-V assembly.
 
-The program will use nested loops to calculate each output element:
+The program uses nested loops to calculate each output element:
 
+```text
 C[i][j] = A[i][0]B[0][j] + A[i][1]B[1][j] + ... + A[i][N-1]B[N-1][j]
+```
 
-The processor will perform the required loads, address calculations, multiplication, accumulation, loop control, and stores using RISC-V instructions.
+The processor performs the required loads, address calculations, multiplication, accumulation, loop control, and stores using RISC-V instructions.
 
-The RISC-V processor will be extended with hardware multiply (`MUL`) support before performing the comparison.
+2×2, 4×4, and 8×8 matrix multiplication benchmarks were run on the RISC-V CPU, single-MAC accelerator, and systolic accelerator.
 
-### Comparison
+---
 
-The implementations can be compared using measurements such as:
+## Performance Comparison
 
-- Total clock cycles for one matrix multiplication
-- Time required to complete one matrix multiplication
-- Number of multiply-accumulate operations completed per cycle
-- How the designs scale as the matrix size increases
+The three architectures were compared using:
 
-The purpose of the comparison is to see how the same matrix multiplication behaves when executed instruction-by-instruction on a processor, using one dedicated MAC unit, and using many processing elements in parallel.
+- Total clock cycles
+- Post-implementation maximum clock frequency
+- Execution time
+- LUT and flip-flop usage
+- Execution-time speedup
+
+Execution time was calculated using:
+
+$$
+T_{execution} = \frac{\text{Cycles}}{F_{max}}
+$$
+
+Speedup between two implementations was calculated using:
+
+$$
+\text{Speedup} =
+\frac{T_{\text{baseline}}}{T_{\text{accelerated}}}
+$$
+
+### Benchmark Results
+
+| Architecture | N | Cycles | Fmax (MHz) | LUTs | FFs | DSPs | BRAMs | Execution Time (µs) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| RISC-V CPU | 2 | 163 | 58 | 554 | 423 | 3 | 0.5 | 2.8103 |
+| RISC-V CPU | 4 | 969 | 58 | 554 | 423 | 3 | 0.5 | 16.7069 |
+| RISC-V CPU | 8 | 6913 | 58 | 554 | 423 | 3 | 0.5 | 119.1897 |
+| Single MAC | 2 | 16 | 165 | 66 | 27 | 0 | 0 | 0.0970 |
+| Single MAC | 4 | 96 | 165 | 66 | 27 | 0 | 0 | 0.5818 |
+| Single MAC | 8 | 640 | 165 | 66 | 27 | 0 | 0 | 3.8788 |
+| Systolic Array | 2 | 6 | 406 | 43 | 74 | 0 | 0 | 0.0148 |
+| Systolic Array | 4 | 12 | 184 | 278 | 283 | 0 | 0 | 0.0652 |
+| Systolic Array | 8 | 24 | 152 | 2141 | 1053 | 0 | 0 | 0.1579 |
+
+### Execution-Time Speedup
+
+| Matrix Size | CPU vs Single MAC | CPU vs Systolic | Single MAC vs Systolic |
+|---|---:|---:|---:|
+| 2×2 | 28.98× | 190.17× | 6.56× |
+| 4×4 | 28.71× | 256.17× | 8.92× |
+| 8×8 | 30.73× | 754.87× | 24.57× |
+
+### Results
+
+The RISC-V CPU uses the same processor hardware for all three matrix sizes, but the number of cycles increases as the amount of matrix multiplication work increases. The measured cycle count increased from 163 cycles for 2×2 to 6913 cycles for 8×8.
+
+The single-MAC accelerator also reuses the same arithmetic hardware for each matrix size. Its LUT and flip-flop usage remained the same in the tested implementations, while its cycle count increased from 16 cycles for 2×2 to 640 cycles for 8×8.
+
+The systolic array uses additional hardware as `N` increases because a larger array contains more processing elements. This can be seen in the LUT and flip-flop counts, which increase substantially between the 2×2 and 8×8 implementations.
+
+In exchange for the additional hardware, the systolic array requires far fewer cycles. The measured cycle counts were 6 cycles for 2×2, 12 cycles for 4×4, and 24 cycles for 8×8.
+
+The systolic array's measured Fmax decreased from 406 MHz for the 2×2 implementation to 152 MHz for the 8×8 implementation. Despite the lower clock frequency, the reduced cycle count still gave the systolic array the lowest execution time in every tested configuration.
+
+For the 8×8 benchmark, the systolic array completed matrix multiplication in **24 cycles at 152 MHz**, corresponding to an execution time of approximately **158 ns**. This was approximately **755× faster than the RISC-V CPU** and **24.6× faster than the single-MAC accelerator**.
 
 ---
 
@@ -327,6 +384,56 @@ Each accelerator output is then compared against the expected value.
 
 Twenty randomized test cases are performed.
 
+### Systolic Benchmark Tests
+
+Additional benchmark testbenches measure the cycle count of the systolic accelerator for the same matrix sizes used by the RISC-V and single-MAC benchmarks.
+
+Measured results:
+
+| Matrix Size | Cycles |
+|---|---:|
+| 2×2 | 6 |
+| 4×4 | 12 |
+| 8×8 | 24 |
+
+Each benchmark checks every output element before reporting the cycle count.
+
+### Single-MAC Benchmark Tests
+
+The parameterized single-MAC accelerator includes self-checking benchmark testbenches for:
+
+- `singleMacBenchmark2x2_tb.sv`
+- `singleMacBenchmark4x4_tb.sv`
+- `singleMacBenchmark8x8_tb.sv`
+
+Measured results:
+
+| Matrix Size | Cycles |
+|---|---:|
+| 2×2 | 16 |
+| 4×4 | 96 |
+| 8×8 | 640 |
+
+Each benchmark checks every output element stored in `RAMC` before reporting the cycle count.
+
+### RISC-V Benchmark Tests
+
+The RISC-V processor includes equivalent matrix multiplication benchmarks for:
+
+- 2×2
+- 4×4
+- 8×8
+
+Measured results:
+
+| Matrix Size | Cycles |
+|---|---:|
+| 2×2 | 163 |
+| 4×4 | 969 |
+| 8×8 | 6913 |
+
+The benchmark programs perform matrix multiplication using RISC-V assembly and use hardware `MUL` instructions for multiplication.
+
 ### Component-Level Verification
 
 Additional testbenches check individual parts of the systolic design, including:
@@ -334,8 +441,21 @@ Additional testbenches check individual parts of the systolic design, including:
 - Processing element
 - Data skewer
 - Systolic array
+- Systolic datapath
 
-The single-MAC design also includes a self-checking 4×4 matrix multiplication testbench.
+The single-MAC design also includes datapath-level verification in addition to the 2×2, 4×4, and 8×8 benchmark testbenches.
+
+---
+
+## FPGA Implementation
+
+The single-MAC and systolic designs were synthesized and implemented in Vivado for the Digilent Basys 3 FPGA using the Artix-7 XC7A35T device.
+
+Post-implementation timing analysis was used to determine the maximum tested clock frequency for each 2×2, 4×4, and 8×8 configuration.
+
+The implementations were also characterized using LUT and flip-flop utilization from the Vivado implementation reports.
+
+These measurements were combined with the simulated cycle counts to calculate execution time for each architecture and matrix size.
 
 ---
 
@@ -353,43 +473,33 @@ Run the simulation with:
 vvp accelerator_tb
 ```
 
-Other accelerator testbenches can be compiled by replacing `accelerator_tb.sv` with:
+Other systolic testbenches can be compiled by replacing `accelerator_tb.sv` with the desired testbench.
 
-- `accelerator2x2_tb.sv`
-- `accelerator5x5_tb.sv`
-- `acceleratorRandom_tb.sv`
+For example, the 8×8 benchmark uses:
 
----
-
-## Repository Structure
-
-```text
-FPGA-Matrix-Multiplication-Accelerator/
-|
-+-- Single MAC/
-|   +-- controller.sv
-|   +-- datapath.sv
-|   +-- accumulator.sv
-|   +-- multiplier.sv
-|   +-- matrixCounter.sv
-|   +-- ROMA.sv
-|   +-- ROMB.sv
-|   +-- RAMC.sv
-|   +-- datapath_tb.sv
-|
-+-- Systolic Array/
-    +-- accelerator.sv
-    +-- systolicController.sv
-    +-- systolicDatapath.sv
-    +-- dataSkewer.sv
-    +-- processingElement.sv
-    +-- systolicArrayNxN.sv
-    +-- accelerator_tb.sv
-    +-- accelerator2x2_tb.sv
-    +-- accelerator5x5_tb.sv
-    +-- acceleratorRandom_tb.sv
-    +-- component-level testbenches
+```bash
+iverilog -g2012 -s systolicBenchmark8x8_tb -o systolicBenchmark8x8_tb systolicBenchmark8x8_tb.sv accelerator.sv systolicController.sv systolicDatapath.sv dataSkewer.sv systolicArrayNxN.sv processingElement.sv
 ```
+
+Run with:
+
+```bash
+vvp systolicBenchmark8x8_tb
+```
+
+From the `Single MAC` directory, compile the 4×4 benchmark with:
+
+```bash
+iverilog -g2012 -s singleMacBenchmark4x4_tb -o singleMacBenchmark4x4_tb singleMacBenchmark4x4_tb.sv accumulator.sv controller.sv datapath.sv matrixCounter.sv multiplier.sv RAMA.sv RAMB.sv RAMC.sv
+```
+
+Run with:
+
+```bash
+vvp singleMacBenchmark4x4_tb
+```
+
+The corresponding 2×2 and 8×8 benchmark testbenches can be run in the same way.
 
 ---
 
@@ -399,6 +509,7 @@ FPGA-Matrix-Multiplication-Accelerator/
 - Icarus Verilog
 - GTKWave
 - Vivado
+- Digilent Basys 3
 
 ---
 
@@ -406,21 +517,23 @@ FPGA-Matrix-Multiplication-Accelerator/
 
 Implemented:
 
-- 4×4 single-MAC matrix multiplication accelerator
-- Parameterized `N × N` systolic accelerator
+- Parameterized `N × N` single-MAC matrix multiplication accelerator
+- Parameterized `N × N` output-stationary systolic accelerator
 - `N × N` grid of processing elements
 - Input skewing
 - Valid signals for controlling MAC operations
 - Feed and drain controller states
 - Multiple matrix multiplications using the same accelerator
-- 2×2, 4×4, and 5×5 verification
-- Self-checking testbenches
-- Randomized testing
-
-Planned:
-
-- RISC-V assembly comparison
-- Hardware `MUL` support for the RISC-V processor
-- FPGA synthesis and resource usage results
-- Cycle-count comparison between the single-MAC and systolic designs
-- Performance comparison between the RISC-V, single-MAC, and systolic implementations
+- 2×2, 4×4, and 5×5 systolic verification
+- Randomized systolic verification
+- 2×2, 4×4, and 8×8 benchmark testbenches
+- Parameterized single-MAC benchmark testing
+- RISC-V assembly matrix multiplication baseline
+- RISC-V hardware `MUL` support
+- FPGA synthesis and implementation
+- Post-implementation Fmax measurements
+- LUT and flip-flop utilization measurements
+- Cycle-count comparison between all three architectures
+- Execution-time comparison between all three architectures
+- Execution-time speedup comparison
+- Self-checking SystemVerilog testbenches
