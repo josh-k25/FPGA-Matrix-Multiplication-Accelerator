@@ -293,17 +293,17 @@ $$
 
 ### Benchmark Results
 
-| Architecture | N | Cycles | Fmax (MHz) | LUTs | FFs | DSPs | BRAMs | Execution Time (µs) |
+| Architecture | N | Cycles | Fmax (MHz) | LUTs | FFs | Execution Time (µs) |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| RISC-V CPU | 2 | 163 | 58 | 554 | 423 | 3 | 0.5 | 2.8103 |
-| RISC-V CPU | 4 | 969 | 58 | 554 | 423 | 3 | 0.5 | 16.7069 |
-| RISC-V CPU | 8 | 6913 | 58 | 554 | 423 | 3 | 0.5 | 119.1897 |
-| Single MAC | 2 | 16 | 165 | 66 | 27 | 0 | 0 | 0.0970 |
-| Single MAC | 4 | 96 | 165 | 66 | 27 | 0 | 0 | 0.5818 |
-| Single MAC | 8 | 640 | 165 | 66 | 27 | 0 | 0 | 3.8788 |
-| Systolic Array | 2 | 6 | 406 | 43 | 74 | 0 | 0 | 0.0148 |
-| Systolic Array | 4 | 12 | 184 | 278 | 283 | 0 | 0 | 0.0652 |
-| Systolic Array | 8 | 24 | 152 | 2141 | 1053 | 0 | 0 | 0.1579 |
+| RISC-V CPU | 2 | 163 | 58 | 554 | 423 | 2.8103 |
+| RISC-V CPU | 4 | 969 | 58 | 554 | 423 | 16.7069 |
+| RISC-V CPU | 8 | 6913 | 58 | 554 | 423 | 119.1897 |
+| Single MAC | 2 | 16 | 165 | 66 | 27 | 0.0970 |
+| Single MAC | 4 | 96 | 165 | 66 | 27 | 0.5818 |
+| Single MAC | 8 | 640 | 165 | 66 | 27 |3.8788 |
+| Systolic Array | 2 | 6 | 406 | 43 | 74 |0.0148 |
+| Systolic Array | 4 | 12 | 184 | 278 | 283 |0.0652 |
+| Systolic Array | 8 | 24 | 152 | 2141 | 1053 | 0.1579 |
 
 ### Execution-Time Speedup
 
