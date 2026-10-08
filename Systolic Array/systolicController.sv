@@ -43,6 +43,7 @@ always_comb begin
     nextState = currentState;
 
     case (currentState)
+        //nothing happens
         IDLE: begin
             clear = 1'b0;
             feedValid = 1'b0;
@@ -59,6 +60,7 @@ always_comb begin
 
         end
 
+        //clears the pe's
         CLEAR_STATE: begin
             clear = 1'b1;
             feedValid = 1'b0;
@@ -71,6 +73,7 @@ always_comb begin
             nextState = FEED;
         end
 
+        //feeds the values of the matrices
         FEED: begin
             clear = 1'b0;
             feedValid = 1'b1;
@@ -89,6 +92,7 @@ always_comb begin
             end
         end
 
+        //all values have been fed 
         DRAIN: begin
             clear = 1'b0;
             feedValid = 1'b0;
@@ -107,6 +111,7 @@ always_comb begin
             end
         end
 
+        //calculations finished
         DONE: begin
             clear = 1'b0;
             feedValid = 1'b0;

@@ -1,6 +1,9 @@
 module systolicDatapath #(
-    parameter int N = 4,
-    parameter int sum_width = 16 + $clog2(N)
+    parameter int rowsA = 8,
+    parameter int columnsA = 4,
+    parameter int rowsB = 4,
+    parameter int columnsB = 8,
+    parameter int sum_width = 16 + $clog2(columnsA)
 )(
     input logic clk,
     input logic reset,
@@ -10,7 +13,7 @@ module systolicDatapath #(
     input logic kClear,
     input logic drainCount,
     input logic drainClear,
-    input logic [N-1:0][N-1:0][7:0] matrixA,
+    input logic [rowsA-1:0][columnsA-1:0][7:0] matrixA,
     input logic [N-1:0][N-1:0][7:0] matrixB,
 
     output logic lastK,

@@ -1,16 +1,22 @@
 module accelerator #(
-    parameter int N = 4,
-    parameter int sum_width = 16 + $clog2(N)
+    parameter int rowsA = 8,
+    parameter int columnsA = 4,
+    parameter int rowsB = 4,
+    parameter int columnsB = 8,
+    /*number of calculations in each cell is = # of columns in matrix a or the number of rows im matrix b
+    so 16 + clog2(# of columns in a) should be sufficcient for bit width assumign 8 bit elements
+    */
+    parameter int sum_width = 16 + $clog2(columnsA)
 )(
     input logic clk,
     input logic reset,
     input logic start,
 
-    input logic [N-1:0][N-1:0][7:0] matrixA,
-    input logic [N-1:0][N-1:0][7:0] matrixB,
+    input logic [rowsA-1:0][columnsA-1:0][7:0] matrixA,
+    input logic [rowsB-1:0][columnsB-1:0][7:0] matrixB,
 
     output logic done,
-    output logic [N-1:0][N-1:0][sum_width-1:0] result
+    output logic [rowsA-1:0][columnsB-1:0][sum_width-1:0] result
 );
 
 //controller -> datapath control signals
