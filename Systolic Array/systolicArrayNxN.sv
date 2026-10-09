@@ -1,6 +1,9 @@
 module systolicArrayNxN #(
     parameter int N = 4,
-    parameter int sum_width = 16 + $clog2(N)
+    parameter int columnsA = 4,
+    parameter int rowsB = 4,
+    parameter int columnsB = 8,
+    parameter int sum_width = 16 + $clog2(columnsA)
     )(
     input logic clk,
     input logic reset,
@@ -25,16 +28,19 @@ genvar r;
 genvar c;
 
 generate
+    //wiring between a values going right
     for (r = 0; r < N; r = r + 1) begin
         assign A_link[r][0] = dataInA[r];
         assign AValid_link[r][0] = AValidIn[r];
     end
 
+    //woromg betweem b valies going left
     for (c = 0; c < N; c = c + 1) begin
         assign B_link[0][c] = dataInB[c];
         assign BValid_link[0][c] = BValidIn[c];
     end
 
+    //PE generation for NxN (need to fix?)
     for (r = 0; r < N; r = r + 1) begin : rows
         for (c = 0; c < N; c = c + 1) begin : cols
             processingElement #(

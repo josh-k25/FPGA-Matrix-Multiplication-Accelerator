@@ -62,6 +62,7 @@ always_ff @(posedge clk) begin
         drain <= drain + 1;
 end
 
+
 assign lastK = (k == N-1);
 assign lastDrain = (drain == DRAIN_CYCLES);
 
@@ -89,6 +90,9 @@ genvar col;
 genvar bRow;
 genvar bCol;
 
+//generate combinational wiring from the original matrices to the raw operand lanes
+// rawA receives column k of matrixA
+//matrixB is copied into an unpacked array before selecting row k to work around icarus Verilog indexing compatibility issues
 generate 
 for (row = 0; row < N; row++)
     assign rawA[row] = matrixA[row][k];
