@@ -40,8 +40,7 @@ initial begin
 
     matrixA = '0;
     matrixB = '0;
-
-    @(posedge clk);
+    
     @(posedge clk);
     #1;
     reset = 0;
@@ -151,4 +150,4 @@ initial begin
 
 end
 
-endmodule
+endmodulez

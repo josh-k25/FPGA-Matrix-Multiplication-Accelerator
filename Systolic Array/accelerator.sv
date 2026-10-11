@@ -1,22 +1,27 @@
 module accelerator #(
-    parameter int rowsA = 8,
-    parameter int columnsA = 4,
-    parameter int rowsB = 4,
-    parameter int columnsB = 8,
+    parameter int N = 8,
     /*number of calculations in each cell is = # of columns in matrix a or the number of rows im matrix b
     so 16 + clog2(# of columns in a) should be sufficcient for bit width assumign 8 bit elements
     */
-    parameter int sum_width = 16 + $clog2(columnsA)
+    parameter int sum_width = 16 + $clog2(N)
 )(
     input logic clk,
     input logic reset,
     input logic start,
 
-    input logic [rowsA-1:0][columnsA-1:0][7:0] matrixA,
-    input logic [rowsB-1:0][columnsB-1:0][7:0] matrixB,
+    input logic [N-1:0][N-1:0][7:0] matrixA,
+    input logic [N-1:0][N-1:0][7:0] matrixB,
+
+    //true dimensions of the matrices as they come in
+    //number of rows in matrix A
+    input logic [N-1:0] M,
+    //number of columns in A and number of rows in B
+    input logic [N-1:0] K,
+    //number of coluumns in matrix b
+    input logic [N-1:0] P,
 
     output logic done,
-    output logic [rowsA-1:0][columnsB-1:0][sum_width-1:0] result
+    output logic [N-1:0][N-1:0][sum_width-1:0] result
 );
 
 //controller -> datapath control signals
@@ -64,6 +69,10 @@ systolicDatapath #(
 
     .matrixA(matrixA),
     .matrixB(matrixB),
+
+    .M(M),
+    .K(K),
+    .P(P),
 
     .lastK(lastK),
     .lastDrain(lastDrain),

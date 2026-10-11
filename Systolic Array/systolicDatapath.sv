@@ -1,9 +1,6 @@
 module systolicDatapath #(
-    parameter int rowsA = 8,
-    parameter int columnsA = 4,
-    parameter int rowsB = 4,
-    parameter int columnsB = 8,
-    parameter int sum_width = 16 + $clog2(columnsA)
+    parameter int N = 8,
+    parameter int sum_width = 16 + $clog2(N)
 )(
     input logic clk,
     input logic reset,
@@ -13,8 +10,12 @@ module systolicDatapath #(
     input logic kClear,
     input logic drainCount,
     input logic drainClear,
-    input logic [rowsA-1:0][columnsA-1:0][7:0] matrixA,
+    input logic [N-1:0][N-1:0][7:0] matrixA,
     input logic [N-1:0][N-1:0][7:0] matrixB,
+    input logic [N-1:0] M,
+    input logic [N-1:0] K,
+    input logic [N-1:0] P,
+
 
     output logic lastK,
     output logic lastDrain,
@@ -62,8 +63,8 @@ always_ff @(posedge clk) begin
         drain <= drain + 1;
 end
 
-
-assign lastK = (k == N-1);
+//signal to say when the k is on its last count (tracks which inner dimension slice is currently being fed)
+assign lastK = (k == K-1);
 assign lastDrain = (drain == DRAIN_CYCLES);
 
 dataSkewer #(
@@ -108,9 +109,17 @@ for (row = 0; row < N; row++)
     end
 endgenerate
 
+//logic to assert valid for lanes that are being used based off matrix size
+//lane is valid if feed valid is on AND its given index is less or equal to the matrix A row / Matrix B col 
+always_comb begin
+    for (int i = 0; i < N; i++) begin
+        rawAValid[i] = (feedValid && (i < M));
+    end
 
-assign rawAValid = {N{feedValid}};
-assign rawBValid = {N{feedValid}};
+    for (int j = 0; j < N; j++) begin
+        rawBValid[j] = (feedValid && (j < P));
+    end
+end
 
 systolicArrayNxN #(
     .N(N),

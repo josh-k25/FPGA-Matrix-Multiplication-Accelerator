@@ -1,9 +1,6 @@
 module systolicArrayNxN #(
     parameter int N = 4,
-    parameter int columnsA = 4,
-    parameter int rowsB = 4,
-    parameter int columnsB = 8,
-    parameter int sum_width = 16 + $clog2(columnsA)
+    parameter int sum_width = 16 + $clog2(N)
     )(
     input logic clk,
     input logic reset,
