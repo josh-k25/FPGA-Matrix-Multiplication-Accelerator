@@ -6,20 +6,20 @@ module systolicArrayNxN #(
     input logic reset,
     input logic clear,
 
-    input logic [N-1:0][7:0] dataInA,
-    input logic [N-1:0][7:0] dataInB,
+    input logic [N-1:0][7:0] dataInA;
+    input logic [N-1:0][7:0] dataInB;
 
-    input logic [N-1:0] AValidIn,
-    input logic [N-1:0] BValidIn,
+    input logic [N-1:0] AValidIn;
+    input logic [N-1:0] BValidIn;
 
-    output logic [N-1:0][N-1:0][sum_width-1:0] sum
+    output logic [N-1:0][N-1:0][sum_width-1:0] sum;
 );
 
-logic [7:0] A_link [0:N-1][0:N];
-logic [7:0] B_link [0:N][0:N-1];
+logic signed [7:0] A_link [0:N-1][0:N];
+logic signed [7:0] B_link [0:N][0:N-1];
 
-logic AValid_link [0:N-1][0:N];
-logic BValid_link [0:N][0:N-1];
+logic signed AValid_link [0:N-1][0:N];
+logic signed BValid_link [0:N][0:N-1];
 
 genvar r;
 genvar c;

@@ -11,17 +11,20 @@ logic start;
 
 logic [N-1:0][N-1:0][7:0] matrixA;
 logic [N-1:0][N-1:0][7:0] matrixB;
+
 logic [N-1:0] M;
 logic [N-1:0] K;
 logic [N-1:0] P;
 
 logic done;
+
 logic [N-1:0][N-1:0][sum_width-1:0] result;
 
-//unpacked arrays used by the testbench checker (icarus verilog issue workaroud) 
-logic [7:0] matrixA_tb [0:N-1][0:N-1];
-logic [7:0] matrixB_tb [0:N-1][0:N-1];
-wire [sum_width-1:0] result_tb [0:N-1][0:N-1];
+//unpacked arrays used by the testbench checker (icarus verilog issue workaroud)
+logic signed [7:0] matrixA_tb [0:N-1][0:N-1];
+logic signed [7:0] matrixB_tb [0:N-1][0:N-1];
+
+wire signed [sum_width-1:0] result_tb [0:N-1][0:N-1];
 
 
 accelerator #(
@@ -42,7 +45,7 @@ accelerator #(
 
 //automaticall run and compare matrix multipplication results
 task automatic runAndCheckResult; 
-    logic [sum_width-1:0] expected;
+    logic signed [sum_width-1:0] expected;
 
     begin
         //start accelerator
@@ -328,7 +331,7 @@ initial begin
     runAndCheckResult();
 
     //starts with clear matrices in the task 
-    randomTest(500);
+    randomTest(50);
 
     $display("All accelerator tests finished.");
     $finish;

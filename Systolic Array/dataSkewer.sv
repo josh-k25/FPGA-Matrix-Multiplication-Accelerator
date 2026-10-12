@@ -3,24 +3,24 @@ module dataSkewer #(
 )(
     input logic clk,
     input logic reset,
-    input logic [N-1:0][7:0] rawA,
-    input logic [N-1:0][7:0] rawB,
+    input logic signed [N-1:0][7:0] rawA,
+    input logic signed [N-1:0][7:0] rawB,
 
-    input logic [N-1:0] rawAValid,
-    input logic [N-1:0] rawBValid,
+    input logic signed [N-1:0] rawAValid,
+    input logic signed [N-1:0] rawBValid,
 
-    output logic [N-1:0][7:0] skewedA,
-    output logic [N-1:0][7:0] skewedB,
+    output logic signed [N-1:0][7:0] skewedA,
+    output logic signed [N-1:0][7:0] skewedB,
 
-    output logic [N-1:0] skewedAValid,
-    output logic [N-1:0] skewedBValid
+    output logic signed [N-1:0] skewedAValid,
+    output logic signed [N-1:0] skewedBValid
 );
 
-logic [7:0] A_delay [0:N-1][0:N-1];
-logic [7:0] B_delay [0:N-1][0:N-1];
+logic signed [7:0] A_delay [0:N-1][0:N-1];
+logic signed [7:0] B_delay [0:N-1][0:N-1];
 
-logic AValid_delay [0:N-1][0:N-1];
-logic BValid_delay [0:N-1][0:N-1];
+logic signed AValid_delay [0:N-1][0:N-1];
+logic signed BValid_delay [0:N-1][0:N-1];
 
 genvar lane;
 
