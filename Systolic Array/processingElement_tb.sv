@@ -5,16 +5,17 @@ module processingElement_tb;
 logic clk;
 logic clear;
 logic reset;
-logic [7:0] dataInA;
-logic [7:0] dataInB;
+
+logic signed [7:0] dataInA;
+logic signed [7:0] dataInB;
 logic AValidIn;
 logic BValidIn;
 
-logic [7:0] dataOutA;
-logic [7:0] dataOutB;
+logic signed [7:0] dataOutA;
+logic signed [7:0] dataOutB;
 logic AValidOut;
 logic BValidOut;
-logic [17:0] sum;
+logic signed [17:0] sum;
 
 processingElement dut(
     .clk(clk),
@@ -95,7 +96,7 @@ initial begin
     AValidIn = 1'b0;
     BValidIn = 1'b0;
 
-    @(posedge clk)
+    @(posedge clk);
     #1;
 
     if (sum !== 18'd26)
@@ -111,7 +112,7 @@ initial begin
 
     if (dataOutA !== 8'd4)
         $fatal(1, "dataOutA failed.");
-    
+
     if (dataOutB !== 8'd5)
         $fatal(1, "dataOutB failed.");
 
@@ -121,7 +122,74 @@ initial begin
     if (BValidOut !== 1'b0)
         $fatal(1, "BValidOut failed.");
 
-    $display("All tests finished.");
+
+    //signed calculation tests
+    clear = 1'b0;
+    AValidIn = 1'b1;
+    BValidIn = 1'b1;
+
+    //neg x pos
+    dataInA = -8'sd3;
+    dataInB = 8'sd4;
+
+    @(posedge clk);
+    #1;
+
+    if (sum !== -18'sd12)
+        $fatal(1, "Signed multiply failed. (-3 x 4 = -12).");
+
+
+    // pos x neg
+    dataInA = 8'sd3;
+    dataInB = -8'sd4;
+
+    @(posedge clk);
+    #1;
+
+    if (sum !== -18'sd24)
+        $fatal(1, "Signed accumulate failed. (-12 + (3 x -4) = -24).");
+
+
+    // neg x neg
+    dataInA = -8'sd3;
+    dataInB = -8'sd4;
+
+    @(posedge clk);
+    #1;
+
+    if (sum !== -18'sd12)
+        $fatal(1, "Signed accumulate failed. (-24 + (-3 x -4) = -12).");
+
+
+    // pos x pos
+    dataInA = 8'sd3;
+    dataInB = 8'sd4;
+
+    @(posedge clk);
+    #1;
+
+    if (sum !== 18'sd0)
+        $fatal(1, "Signed accumulate failed. (-12 + (3 x 4) = 0).");
+
+
+    //signed max edge case
+    clear = 1'b1;
+
+    @(posedge clk);
+    #1;
+
+    clear = 1'b0;
+    dataInA = -8'sd128;
+    dataInB = 8'sd127;
+
+    @(posedge clk);
+    #1;
+
+    if (sum !== -18'sd16256)
+        $fatal(1, "Signed boundary multiply failed. (-128 x 127 = -16256).");
+
+
+    $display("All processing element tests finished.");
     $finish;
 
 end

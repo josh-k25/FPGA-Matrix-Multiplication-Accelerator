@@ -4,16 +4,17 @@ module processingElement #(
     input logic clk,
     input logic clear,
     input logic reset,
-    input logic [7:0] dataInA,
-    input logic [7:0] dataInB,
+    //addign signed keyword implies signed logic for compiler
+    input logic signed [7:0] dataInA,
+    input logic signed [7:0] dataInB,
     input logic AValidIn,
     input logic BValidIn,
     
-    output logic [7:0] dataOutA,
-    output logic [7:0] dataOutB,
+    output logic signed [7:0] dataOutA,
+    output logic signed [7:0] dataOutB,
     output logic AValidOut,
     output logic BValidOut,
-    output logic [sum_width - 1:0] sum
+    output logic signed [sum_width - 1:0] sum
 );
 
 always_ff @(posedge clk) begin
@@ -25,7 +26,8 @@ always_ff @(posedge clk) begin
         sum <= '0;
     end
     else if (AValidIn && BValidIn) begin
-        sum <= sum + (dataInA * dataInB);
+        //use $signed for signed calculations 
+        sum <= sum + ($signed(dataInA) * $signed(dataInB));
     end
 
     if (reset) begin
