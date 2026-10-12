@@ -88,6 +88,39 @@ task automatic clearMatrices;
     end
 endtask
 
+//test random input sizes and values and check them
+task automatic randomTest(input int numberOfTests);
+    begin
+        for (int test = 0; test < numberOfTests; test++) begin
+
+            clearMatrices();
+
+            M = $urandom_range(N, 1);
+            K = $urandom_range(N, 1);
+            P = $urandom_range(N, 1);
+
+            //randomize valid elements of A
+            for (int row = 0; row < M; row++) begin
+                for (int col = 0; col < K; col++) begin
+                    matrixA_tb[row][col] = $urandom_range(255, 0);
+                end
+            end
+
+            //randomize valid elements of B
+            for (int row = 0; row < K; row++) begin
+                for (int col = 0; col < P; col++) begin
+                    matrixB_tb[row][col] = $urandom_range(255, 0);
+                end
+            end
+
+            $display(
+                "Random test %0d: (%0dx%0d) x (%0dx%0d)", test + 1, M, K, K, P);
+
+            runAndCheckResult();
+
+        end
+    end
+endtask
 
 //generate wires from unpacked to packed arrays
 genvar r;
@@ -294,7 +327,10 @@ initial begin
 
     runAndCheckResult();
 
-    $display("All 3x2 ((3x4) x (4x2))  accelerator tests finished.");
+    //starts with clear matrices in the task 
+    randomTest(500);
+
+    $display("All accelerator tests finished.");
     $finish;
 
 end
